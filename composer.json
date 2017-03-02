@@ -1,6 +1,6 @@
 {
   "name": "moodlerooms/behat-junit-extension",
-  "description": " ",
+  "description": "Behat extension that reports with the JUnit format and is compatible with Moodle reruns.",
   "keywords": ["moodle", "behat", "junit"],
   "type": "project",
   "license": "GPL-3.0",

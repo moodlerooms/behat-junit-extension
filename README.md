@@ -1,6 +1,6 @@
 # Introduction
 
-todo
+Behat extension that reports with the JUnit format and is compatible with Moodle reruns.
 
 # Install
 
@@ -18,7 +18,7 @@ default:
     ...
 
     extensions:
-        BehatJUnitExtension:
+        Moodlerooms\BehatJUnitExtension\Extension:
             outputDir: %paths.base%/build/tests
     ...
 ```
