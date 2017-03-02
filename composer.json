@@ -1,0 +1,30 @@
+{
+  "name": "moodlerooms/behat-junit-extension",
+  "description": " ",
+  "keywords": ["moodle", "behat", "junit"],
+  "type": "project",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "Mark Nielsen",
+      "email": "mark@moodlerooms.com",
+      "homepage": "http://moodlerooms.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "behat/behat": "~3.0"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^1.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "Moodlerooms\\BehatJUnitExtension\\": "src/"
+    }
+  },
+  "scripts": {
+    "fix": "php-cs-fixer fix -v"
+  }
+}

@@ -1,0 +1,21 @@
+# It is not recommended to modify this file in your
+# local clone. Instead, use .git/info/exclude and add
+# new records there as needed.
+#
+# See gitignore(5) man page for more details
+#
+*~
+*.swp
+vendor/
+.patches/
+.idea/
+nbproject/
+.DS_Store
+.settings/
+.project
+.buildpath
+.cache
+.php_cs.cache
+composer.phar
+phpunit.xml
+composer.lock
