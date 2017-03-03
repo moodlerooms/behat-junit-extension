@@ -150,12 +150,12 @@ class Formatter implements FormatterInterface
     public static function getSubscribedEvents()
     {
         return [
-            ScenarioTested::BEFORE  => ['beforeScenario', -50],
-            ScenarioTested::AFTER   => ['afterScenario', -50],
-            StepTested::AFTER       => ['afterStep', -50],
-            OutlineTested::BEFORE   => ['beforeOutline', -50],
-            ExampleTested::BEFORE   => ['beforeExample', -50],
-            ExampleTested::AFTER    => ['afterScenario', -50],
+            ScenarioTested::BEFORE => ['beforeScenario', -50],
+            ScenarioTested::AFTER  => ['afterScenario', -50],
+            StepTested::AFTER      => ['afterStep', -50],
+            OutlineTested::BEFORE  => ['beforeOutline', -50],
+            ExampleTested::BEFORE  => ['beforeExample', -50],
+            ExampleTested::AFTER   => ['afterScenario', -50],
 
             // All of these events find setup errors.
 
@@ -175,7 +175,9 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * beforeScenario.
+     * Capture scenario title before it starts.
+     *
+     * This is not called for outline/examples.
      *
      * @param BeforeScenarioTested $event
      */
@@ -185,7 +187,7 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * beforeOutline.
+     * Capture outline title before it starts.
      *
      * @param BeforeOutlineTested $event
      */
@@ -195,7 +197,7 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * beforeExample.
+     * Capture example line number and combine it with outline title.
      *
      * @param BeforeScenarioTested $event
      */
@@ -218,7 +220,7 @@ class Formatter implements FormatterInterface
     }
 
     /**
-     * afterStep.
+     * Look for errors after the step has been executed.
      *
      * @param AfterStepTested $event
      */
@@ -248,6 +250,7 @@ class Formatter implements FormatterInterface
                 break;
 
             default:
+                // This captures errors in tear down hooks, like @AfterStep.
                 $tearDown = $event->getTeardown();
                 if (!$tearDown->isSuccessful() && $tearDown instanceof HookedTeardown) {
                     $this->handleHookCalls($tearDown->getHookCallResults(), 'teardown');
@@ -255,6 +258,11 @@ class Formatter implements FormatterInterface
         }
     }
 
+    /**
+     * After the scenario, gather remaining errors/stats and write the JUnit XML file.
+     *
+     * @param AfterScenarioTested $event
+     */
     public function afterScenario(AfterScenarioTested $event)
     {
         $this->testCaseTimer->stop();
@@ -279,21 +287,32 @@ class Formatter implements FormatterInterface
         $this->printer->write($this->currentDocument->saveXML());
     }
 
+    /**
+     * Initialize JUnit document pieces and start the timer.
+     *
+     * @param ScenarioTested $event
+     * @param string         $name
+     */
     private function initBeforeScenario(ScenarioTested $event, $name)
     {
         $name = implode(' ', array_map(function ($l) {
             return trim($l);
         }, explode("\n", $name)));
 
-        $this->currentDocument  = new Document();
+        $this->currentDocument = new Document();
+
         $this->currentTestSuite = $this->currentDocument->addTestSuite();
         $this->currentTestSuite->setName($event->getFeature()->getTitle());
+
         $this->currentTestCase = $this->currentTestSuite->addTestCase();
         $this->currentTestCase->setName($name);
+
         $this->testCaseTimer->start();
     }
 
     /**
+     * Generate a unique file name for the scenario.
+     *
      * @param AfterScenarioTested $event
      *
      * @return string
@@ -325,6 +344,8 @@ class Formatter implements FormatterInterface
     }
 
     /**
+     * Searches hooks for errors.
+     *
      * @param CallResults $results
      * @param string      $messageType
      */
@@ -343,6 +364,7 @@ class Formatter implements FormatterInterface
                 }
                 $message .= $this->exceptionPresenter->presentException($hookCallResult->getException());
 
+                // We don't add these to currentTestCase because it may not have been setup yet.
                 $this->hookErrors[] = [$messageType, $message];
             }
         }
