@@ -15,14 +15,14 @@ class Extension implements ExtensionInterface
     const RESULT_TO_STRING_CONVERTER_ID = 'output.node.printer.result_to_string';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigKey()
     {
@@ -30,14 +30,14 @@ class Extension implements ExtensionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function initialize(ExtensionManager $extensionManager)
     {
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function configure(ArrayNodeDefinition $builder)
     {
@@ -45,7 +45,7 @@ class Extension implements ExtensionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(ContainerBuilder $container, array $config)
     {

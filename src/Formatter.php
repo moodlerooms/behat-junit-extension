@@ -273,6 +273,7 @@ class Formatter implements FormatterInterface
         if (!empty($this->hookErrors)) {
             foreach ($this->hookErrors as $error) {
                 list($type, $message) = $error;
+
                 $data = $this->currentDocument->createCDATASection($message);
                 $this->currentTestCase->addFailure(null, $type)->appendChild($data);
             }
