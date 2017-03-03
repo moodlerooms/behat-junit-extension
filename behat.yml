@@ -1,0 +1,4 @@
+default:
+  extensions:
+    Moodlerooms\BehatJUnitExtension\Extension:
+      outputDir: %paths.base%/junit
