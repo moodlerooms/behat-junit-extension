@@ -697,62 +697,6 @@ Feature: JUnit Formatter
       """
     And the file "junit/features_world_feature_9.xml" should be a valid document according to "junit.xsd"
 
-  Scenario: Include BeforeFeature Failures
-    Given a file named "features/bootstrap/FeatureContext.php" with:
-      """
-      <?php
-
-      use Behat\Behat\Context\Context,
-          Behat\Behat\Tester\Exception\PendingException;
-
-      class FeatureContext implements Context
-      {
-          private $value;
-
-          /**
-           * @BeforeFeature
-           */
-          public static function setup() {
-            throw new \Exception('failure');
-          }
-
-          /**
-           * @Given /I have entered (\d+)/
-           * @Then /^I must have (\d+)$/
-           */
-          public function action($num)
-          {
-          }
-      }
-      """
-    And a file named "features/World.feature" with:
-      """
-      Feature: World consistency
-        In order to maintain stable behaviors
-        As a features developer
-        I want, that "World" flushes between scenarios
-
-        Background:
-          Given I have entered 10
-
-        Scenario: Failed
-          Then I must have 10
-
-      """
-    When I run "behat --no-colors -f moodle_junit"
-    And "junit/features_world_feature_9.xml" file xml should be like:
-      """
-      <?xml version="1.0" encoding="UTF-8"?>
-      <testsuites>
-        <testsuite name="World consistency" tests="1" failures="1">
-          <testcase name="Failed" time="1" status="skipped">
-            <failure type="setup"><![CDATA[failure (Exception)]]></failure>
-          </testcase>
-        </testsuite>
-      </testsuites>
-      """
-    And the file "junit/features_world_feature_9.xml" should be a valid document according to "junit.xsd"
-
   Scenario: Include AfterStep Failures
     Given a file named "features/bootstrap/FeatureContext.php" with:
       """

@@ -7,7 +7,6 @@ use Behat\Behat\EventDispatcher\Event\AfterStepTested;
 use Behat\Behat\EventDispatcher\Event\BeforeOutlineTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
-use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Behat\Behat\EventDispatcher\Event\OutlineTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Behat\EventDispatcher\Event\StepTested;
@@ -163,6 +162,7 @@ class Formatter implements FormatterInterface
             // I think these have been ruled out as not necessary.
             //SuiteTested::AFTER_SETUP => ['afterSetup', -50],
             //ExerciseCompleted::AFTER_SETUP => ['afterSetup', -50],
+            //FeatureTested::AFTER_SETUP => ['afterSetup', -50],
             //ScenarioTested::AFTER_SETUP => ['afterSetup', -50],
             //ExampleTested::AFTER_SETUP => ['afterSetup', -50],
 
@@ -170,7 +170,6 @@ class Formatter implements FormatterInterface
             //BackgroundTested::AFTER_SETUP => ['afterSetup', -50],
             //OutlineTested::AFTER_SETUP => ['afterSetup', -50],
 
-            FeatureTested::AFTER_SETUP => ['afterSetup', -50],
             StepTested::AFTER_SETUP => ['afterSetup', -50],
         ];
     }
