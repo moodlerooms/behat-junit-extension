@@ -10,10 +10,16 @@ use Behat\Behat\EventDispatcher\Event\ExampleTested;
 use Behat\Behat\EventDispatcher\Event\OutlineTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Behat\EventDispatcher\Event\StepTested;
+use Behat\Behat\Hook\Scope\StepScope;
 use Behat\Behat\Output\Node\Printer\Helper\ResultToStringConverter;
 use Behat\Behat\Tester\Result\StepResult;
+use Behat\Testwork\Call\CallResult;
+use Behat\Testwork\Call\CallResults;
 use Behat\Testwork\Counter\Timer;
+use Behat\Testwork\EventDispatcher\Event\AfterSetup;
 use Behat\Testwork\Exception\ExceptionPresenter;
+use Behat\Testwork\Hook\Call\HookCall;
+use Behat\Testwork\Hook\Tester\Setup\HookedSetup;
 use Behat\Testwork\Output\Formatter as FormatterInterface;
 use Behat\Testwork\Tester\Result\ExceptionResult;
 use Behat\Testwork\Tester\Result\TestResult;
@@ -76,6 +82,13 @@ class Formatter implements FormatterInterface
     private $currentOutlineTitle;
 
     /**
+     * Keeps track of setup errors.
+     *
+     * @var array
+     */
+    private $hookErrors = [];
+
+    /**
      * @param string                  $outputDir
      * @param string                  $baseDir
      * @param ExceptionPresenter      $exceptionPresenter
@@ -136,12 +149,27 @@ class Formatter implements FormatterInterface
     public static function getSubscribedEvents()
     {
         return [
-            ScenarioTested::BEFORE => ['beforeScenario', -50],
-            ScenarioTested::AFTER  => ['afterScenario', -50],
-            StepTested::AFTER      => ['afterStep', -50],
-            OutlineTested::BEFORE  => ['beforeOutline', -50],
-            ExampleTested::BEFORE  => ['beforeExample', -50],
-            ExampleTested::AFTER   => ['afterScenario', -50],
+            ScenarioTested::BEFORE  => ['beforeScenario', -50],
+            ScenarioTested::AFTER   => ['afterScenario', -50],
+            StepTested::AFTER       => ['afterStep', -50],
+            OutlineTested::BEFORE   => ['beforeOutline', -50],
+            ExampleTested::BEFORE   => ['beforeExample', -50],
+            ExampleTested::AFTER    => ['afterScenario', -50],
+
+            // All of these events find setup errors.
+
+            // I think these have been ruled out as not necessary.
+            //SuiteTested::AFTER_SETUP => ['afterSetup', -50],
+            //ExerciseCompleted::AFTER_SETUP => ['afterSetup', -50],
+            //FeatureTested::AFTER_SETUP => ['afterSetup', -50],
+            //ScenarioTested::AFTER_SETUP => ['afterSetup', -50],
+            //ExampleTested::AFTER_SETUP => ['afterSetup', -50],
+
+            // These are a maybe.
+            //BackgroundTested::AFTER_SETUP => ['afterSetup', -50],
+            //OutlineTested::AFTER_SETUP => ['afterSetup', -50],
+
+            StepTested::AFTER_SETUP => ['afterSetup', -50],
         ];
     }
 
@@ -173,6 +201,21 @@ class Formatter implements FormatterInterface
     public function beforeExample(BeforeScenarioTested $event)
     {
         $this->initBeforeScenario($event, $this->currentOutlineTitle.' Line #'.$event->getScenario()->getLine());
+    }
+
+    /**
+     * Catch setup errors.
+     *
+     * @param AfterSetup $event
+     */
+    public function afterSetup(AfterSetup $event)
+    {
+        $setup = $event->getSetup();
+        if (!$setup->isSuccessful()) {
+            if ($setup instanceof HookedSetup) {
+                $this->handleHookCalls($setup->getHookCallResults(), 'setup');
+            }
+        }
     }
 
     /**
@@ -213,6 +256,15 @@ class Formatter implements FormatterInterface
 
         $this->currentTestCase->setTime($this->formatTime($this->testCaseTimer));
         $this->currentTestCase->setAttribute('status', $this->converter->convertResultToString($event->getTestResult()));
+
+        if (!empty($this->hookErrors)) {
+            foreach ($this->hookErrors as $error) {
+                list($type, $message) = $error;
+                $data = $this->currentDocument->createCDATASection($message);
+                $this->currentTestCase->addFailure(null, $type)->appendChild($data);
+            }
+            $this->hookErrors = [];
+        }
 
         // Don't think these cause any real problems, but fail to pass the junit.xsd validation.
         $this->currentTestCase->removeAttribute('errors');
@@ -265,5 +317,29 @@ class Formatter implements FormatterInterface
         }
 
         return $time;
+    }
+
+    /**
+     * @param CallResults $results
+     * @param string      $messageType
+     */
+    private function handleHookCalls(CallResults $results, $messageType)
+    {
+        /** @var CallResult $hookCallResult */
+        foreach ($results as $hookCallResult) {
+            if ($hookCallResult->hasException()) {
+                /** @var HookCall $call */
+                $call  = $hookCallResult->getCall();
+                $scope = $call->getScope();
+
+                $message = '';
+                if ($scope instanceof StepScope) {
+                    $message .= $scope->getStep()->getKeyword().' '.$scope->getStep()->getText().': ';
+                }
+                $message .= $this->exceptionPresenter->presentException($hookCallResult->getException());
+
+                $this->hookErrors[] = [$messageType, $message];
+            }
+        }
     }
 }
