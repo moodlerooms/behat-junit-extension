@@ -20,6 +20,7 @@ use Behat\Testwork\EventDispatcher\Event\AfterSetup;
 use Behat\Testwork\Exception\ExceptionPresenter;
 use Behat\Testwork\Hook\Call\HookCall;
 use Behat\Testwork\Hook\Tester\Setup\HookedSetup;
+use Behat\Testwork\Hook\Tester\Setup\HookedTeardown;
 use Behat\Testwork\Output\Formatter as FormatterInterface;
 use Behat\Testwork\Tester\Result\ExceptionResult;
 use Behat\Testwork\Tester\Result\TestResult;
@@ -211,10 +212,8 @@ class Formatter implements FormatterInterface
     public function afterSetup(AfterSetup $event)
     {
         $setup = $event->getSetup();
-        if (!$setup->isSuccessful()) {
-            if ($setup instanceof HookedSetup) {
-                $this->handleHookCalls($setup->getHookCallResults(), 'setup');
-            }
+        if (!$setup->isSuccessful() && $setup instanceof HookedSetup) {
+            $this->handleHookCalls($setup->getHookCallResults(), 'setup');
         }
     }
 
@@ -247,6 +246,12 @@ class Formatter implements FormatterInterface
                 $data = $this->currentDocument->createCDATASection($message);
                 $this->currentTestCase->addError(null, 'undefined')->appendChild($data);
                 break;
+
+            default:
+                $tearDown = $event->getTeardown();
+                if (!$tearDown->isSuccessful() && $tearDown instanceof HookedTeardown) {
+                    $this->handleHookCalls($tearDown->getHookCallResults(), 'teardown');
+                }
         }
     }
 
