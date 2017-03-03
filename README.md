@@ -25,7 +25,7 @@ default:
 
 Be sure to call Behat with the formatter:
 
-    behat -f junit
+    behat -f moodle_junit
 
 # Configuration
 
