@@ -88,90 +88,6 @@ class FeatureContext implements Context
     }
 
     /**
-     * Creates a empty file with specified name in current workdir.
-     *
-     * @Given /^(?:there is )?a file named "([^"]*)"$/
-     *
-     * @param string $filename name of the file (relative path)
-     */
-    public function aFileNamed($filename)
-    {
-        $this->createFile($this->workingDir.'/'.$filename, '');
-    }
-
-    /**
-     * Creates a noop feature context in current workdir.
-     *
-     * @Given /^(?:there is )?a some feature context$/
-     */
-    public function aNoopFeatureContext()
-    {
-        $filename = 'features/bootstrap/FeatureContext.php';
-        $content  = <<<'EOL'
-<?php
-
-use Behat\Behat\Context\Context;
-
-class FeatureContext implements Context
-{
-}
-EOL;
-        $this->createFile($this->workingDir.'/'.$filename, $content);
-    }
-
-    /**
-     * Creates a noop feature in current workdir.
-     *
-     * @Given /^(?:there is )?a some feature scenarios/
-     */
-    public function aNoopFeature()
-    {
-        $filename = 'features/bootstrap/FeatureContext.php';
-        $content  = <<<'EOL'
-Feature:
-        Scenario:
-          When this scenario executes
-EOL;
-        $this->createFile($this->workingDir.'/'.$filename, $content);
-    }
-
-    /**
-     * Moves user to the specified path.
-     *
-     * @Given /^I am in the "([^"]*)" path$/
-     *
-     * @param string $path
-     */
-    public function iAmInThePath($path)
-    {
-        $this->moveToNewPath($path);
-    }
-
-    /**
-     * Checks whether a file at provided path exists.
-     *
-     * @Given /^file "([^"]*)" should exist$/
-     *
-     * @param   string $path
-     */
-    public function fileShouldExist($path)
-    {
-        PHPUnit_Framework_Assert::assertFileExists($this->workingDir.DIRECTORY_SEPARATOR.$path);
-    }
-
-    /**
-     * Sets specified ENV variable
-     *
-     * @When /^"BEHAT_PARAMS" environment variable is set to:$/
-     *
-     * @param PyStringNode $value
-     */
-    public function iSetEnvironmentVariable(PyStringNode $value)
-    {
-        $this->process->setEnv(['BEHAT_PARAMS' => (string) $value]);
-    }
-
-    /**
      * Runs behat command with provided parameters
      *
      * @When /^I run "behat(?: ((?:\"|[^"])*))?"$/
@@ -204,37 +120,6 @@ EOL;
     }
 
     /**
-     * Runs behat command with provided parameters in interactive mode
-     *
-     * @When /^I answer "([^"]+)" when running "behat(?: ((?:\"|[^"])*))?"$/
-     *
-     * @param string $answerString
-     * @param string $argumentsString
-     */
-    public function iRunBehatInteractively($answerString, $argumentsString)
-    {
-        $env                      = $this->process->getEnv();
-        $env['SHELL_INTERACTIVE'] = true;
-
-        $this->process->setEnv($env);
-        $this->process->setInput($answerString);
-
-        $this->options = '--format-settings=\'{"timer": false}\'';
-        $this->iRunBehat($argumentsString);
-    }
-
-    /**
-     * Runs behat command in debug mode
-     *
-     * @When /^I run behat in debug mode$/
-     */
-    public function iRunBehatInDebugMode()
-    {
-        $this->options = '';
-        $this->iRunBehat('--debug');
-    }
-
-    /**
      * Checks whether previously ran command passes|fails with provided output.
      *
      * @Then /^it should (fail|pass) with:$/
@@ -262,28 +147,6 @@ EOL;
     }
 
     /**
-     * Checks whether specified file exists and contains specified string.
-     *
-     * @Then /^"([^"]*)" file should contain:$/
-     *
-     * @param string       $path file path
-     * @param PyStringNode $text file content
-     */
-    public function fileShouldContain($path, PyStringNode $text)
-    {
-        $path = $this->workingDir.'/'.$path;
-        PHPUnit_Framework_Assert::assertFileExists($path);
-
-        $fileContent = trim(file_get_contents($path));
-        // Normalize the line endings in the output
-        if ("\n" !== PHP_EOL) {
-            $fileContent = str_replace(PHP_EOL, "\n", $fileContent);
-        }
-
-        PHPUnit_Framework_Assert::assertEquals($this->getExpectedOutput($text), $fileContent);
-    }
-
-    /**
      * Checks whether specified content and structure of the xml is correct without worrying about layout.
      *
      * @Then /^"([^"]*)" file xml should be like:$/
@@ -304,7 +167,6 @@ EOL;
 
         PHPUnit_Framework_Assert::assertEquals(trim($dom->saveXML()), $fileContent, 'Raw actual: '.PHP_EOL.$fileContent);
     }
-
 
     /**
      * Checks whether last command output contains provided string.
@@ -417,16 +279,6 @@ EOL;
         if (!is_dir($path)) {
             mkdir($path, 0777, true);
         }
-    }
-
-    private function moveToNewPath($path)
-    {
-        $newWorkingDir = $this->workingDir.'/'.$path;
-        if (!file_exists($newWorkingDir)) {
-            mkdir($newWorkingDir, 0777, true);
-        }
-
-        $this->workingDir = $newWorkingDir;
     }
 
     private static function clearDirectory($path)
