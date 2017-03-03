@@ -13,11 +13,31 @@ class Printer implements OutputPrinter
     private $path;
 
     /**
+     * @var string
+     */
+    private $fileName;
+
+    /**
      * @param string $path Path to write JUnit XML files
      */
     public function __construct($path)
     {
         $this->setOutputPath($path);
+    }
+
+    /**
+     * Sets file name.
+     *
+     * @param string $fileName
+     * @param string $extension The file extension, defaults to "xml"
+     */
+    public function setFileName($fileName, $extension = 'xml')
+    {
+        if ('.'.$extension !== substr($fileName, strlen($extension) + 1)) {
+            $fileName .= '.'.$extension;
+        }
+
+        $this->fileName = $fileName;
     }
 
     /**
@@ -94,7 +114,7 @@ class Printer implements OutputPrinter
      */
     public function write($messages)
     {
-        $file = $this->getOutputPath().DIRECTORY_SEPARATOR.'todo.xml';
+        $file = $this->getOutputPath().DIRECTORY_SEPARATOR.$this->fileName;
         file_put_contents($file, $messages);
     }
 

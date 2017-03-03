@@ -302,7 +302,7 @@ EOL;
         $dom->loadXML($text);
         $dom->formatOutput = true;
 
-        PHPUnit_Framework_Assert::assertEquals(trim($dom->saveXML(null, LIBXML_NOEMPTYTAG)), $fileContent);
+        PHPUnit_Framework_Assert::assertEquals(trim($dom->saveXML()), $fileContent);
     }
 
 

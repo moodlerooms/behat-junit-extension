@@ -2,16 +2,24 @@
 
 namespace Moodlerooms\BehatJUnitExtension;
 
+use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
+use Behat\Behat\EventDispatcher\Event\AfterStepTested;
+use Behat\Behat\EventDispatcher\Event\BeforeOutlineTested;
+use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Behat\EventDispatcher\Event\ExampleTested;
-use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Behat\Behat\EventDispatcher\Event\OutlineTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Behat\EventDispatcher\Event\StepTested;
+use Behat\Behat\Output\Node\Printer\Helper\ResultToStringConverter;
 use Behat\Behat\Tester\Result\StepResult as TestResult;
+use Behat\Behat\Tester\Result\StepResult;
 use Behat\Testwork\Counter\Timer;
-use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
-use Behat\Testwork\EventDispatcher\Event\SuiteTested;
+use Behat\Testwork\Exception\ExceptionPresenter;
 use Behat\Testwork\Output\Formatter as FormatterInterface;
+use Behat\Testwork\Tester\Result\ExceptionResult;
+use N98\JUnitXml\Document;
+use N98\JUnitXml\TestCaseElement;
+use N98\JUnitXml\TestSuiteElement;
 
 class Formatter implements FormatterInterface
 {
@@ -21,39 +29,46 @@ class Formatter implements FormatterInterface
     private $printer;
 
     /**
+     * Base directory from where Behat is being run.
+     *
+     * @var string
+     */
+    private $baseDir;
+
+    /**
+     * @var ExceptionPresenter
+     */
+    private $exceptionPresenter;
+
+    /**
+     * @var ResultToStringConverter
+     */
+    private $converter;
+
+    /**
      * @var array
      */
     private $parameters = [];
 
     /**
-     * @var \SimpleXmlElement
+     * @var Document
      */
-    private $xml;
+    private $currentDocument;
 
     /**
-     * @var \SimpleXmlElement
+     * @var TestSuiteElement
      */
-    private $currentTestsuite;
+    private $currentTestSuite;
 
     /**
-     * @var int[]
+     * @var TestCaseElement
      */
-    private $testsuiteStats;
-
-    /**
-     * @var \SimpleXmlElement
-     */
-    private $currentTestcase;
+    private $currentTestCase;
 
     /**
      * @var Timer
      */
-    private $testsuiteTimer;
-
-    /**
-     * @var Timer
-     */
-    private $testcaseTimer;
+    private $testCaseTimer;
 
     /**
      * @var string
@@ -61,13 +76,18 @@ class Formatter implements FormatterInterface
     private $currentOutlineTitle;
 
     /**
-     * @param string $outputDir
+     * @param string                  $outputDir
+     * @param string                  $baseDir
+     * @param ExceptionPresenter      $exceptionPresenter
+     * @param ResultToStringConverter $converter
      */
-    public function __construct($outputDir)
+    public function __construct($outputDir, $baseDir, ExceptionPresenter $exceptionPresenter, ResultToStringConverter $converter)
     {
-        $this->printer        = new Printer($outputDir);
-        $this->testsuiteTimer = new Timer();
-        $this->testcaseTimer  = new Timer();
+        $this->printer            = new Printer($outputDir);
+        $this->testCaseTimer      = new Timer();
+        $this->baseDir            = $baseDir;
+        $this->exceptionPresenter = $exceptionPresenter;
+        $this->converter          = $converter;
     }
 
     /**
@@ -116,85 +136,31 @@ class Formatter implements FormatterInterface
     public static function getSubscribedEvents()
     {
         return [
-            ExerciseCompleted::BEFORE => ['beforeExercise', -50],
-            ExerciseCompleted::AFTER  => ['afterExercise', -50],
-            SuiteTested::BEFORE       => ['beforeSuite', -50],
-            SuiteTested::AFTER        => ['afterSuite', -50],
-            FeatureTested::BEFORE     => ['beforeFeature', -50],
-            FeatureTested::AFTER      => ['afterFeature', -50],
-            ScenarioTested::BEFORE    => ['beforeScenario', -50],
-            ScenarioTested::AFTER     => ['afterScenario', -50],
-            StepTested::AFTER         => ['afterStep', -50],
-            OutlineTested::BEFORE     => ['beforeOutline', -50],
-            ExampleTested::BEFORE     => ['beforeExample', -50],
-            ExampleTested::AFTER      => ['afterScenario', -50],
+            ScenarioTested::BEFORE => ['beforeScenario', -50],
+            ScenarioTested::AFTER  => ['afterScenario', -50],
+            StepTested::AFTER      => ['afterStep', -50],
+            OutlineTested::BEFORE  => ['beforeOutline', -50],
+            ExampleTested::BEFORE  => ['beforeExample', -50],
+            ExampleTested::AFTER   => ['afterScenario', -50],
         ];
-    }
-
-    /**
-     * @param ExerciseCompleted $event
-     */
-    public function beforeExercise(ExerciseCompleted $event)
-    {
-        $this->xml = new \SimpleXmlElement('<testsuites></testsuites>');
-    }
-
-    /**
-     * beforeSuite.
-     *
-     * @param SuiteTested $event
-     */
-    public function beforeSuite(SuiteTested $event)
-    {
-        $suite = $event->getSuite();
-
-        $testsuite = $this->xml->addChild('testsuite');
-        $testsuite->addAttribute('name', $suite->getName());
-        $testsuite->addAttribute('tests', 0);
-    }
-
-    /**
-     * beforeFeature.
-     *
-     * @param FeatureTested $event
-     */
-    public function beforeFeature(FeatureTested $event)
-    {
-        $feature = $event->getFeature();
-
-        $this->currentTestsuite = $testsuite = $this->xml->addChild('testsuite');
-        $testsuite->addAttribute('name', $feature->getTitle());
-
-        $this->testsuiteStats = [
-            TestResult::PASSED    => 0,
-            TestResult::SKIPPED   => 0,
-            TestResult::PENDING   => 0,
-            TestResult::FAILED    => 0,
-            TestResult::UNDEFINED => 0,
-        ];
-
-        $this->testsuiteTimer->start();
     }
 
     /**
      * beforeScenario.
      *
-     * @param ScenarioTested $event
+     * @param BeforeScenarioTested $event
      */
-    public function beforeScenario(ScenarioTested $event)
+    public function beforeScenario(BeforeScenarioTested $event)
     {
-        $this->currentTestcase = $this->currentTestsuite->addChild('testcase');
-        $this->currentTestcase->addAttribute('name', $event->getScenario()->getTitle());
-
-        $this->testcaseTimer->start();
+        $this->initBeforeScenario($event, $event->getScenario()->getTitle());
     }
 
     /**
      * beforeOutline.
      *
-     * @param OutlineTested $event
+     * @param BeforeOutlineTested $event
      */
-    public function beforeOutline(OutlineTested $event)
+    public function beforeOutline(BeforeOutlineTested $event)
     {
         $this->currentOutlineTitle = $event->getOutline()->getTitle();
     }
@@ -202,99 +168,103 @@ class Formatter implements FormatterInterface
     /**
      * beforeExample.
      *
-     * @param ScenarioTested $event
+     * @param BeforeScenarioTested $event
      */
-    public function beforeExample(ScenarioTested $event)
+    public function beforeExample(BeforeScenarioTested $event)
     {
-        $this->currentTestcase = $this->currentTestsuite->addChild('testcase');
-        $this->currentTestcase->addAttribute('name', $this->currentOutlineTitle.' Line #'.$event->getScenario()->getLine());
-
-        $this->testcaseTimer->start();
+        $this->initBeforeScenario($event, $this->currentOutlineTitle.' Line #'.$event->getScenario()->getLine());
     }
 
     /**
      * afterStep.
      *
-     * @param mixed $event
+     * @param AfterStepTested $event
      */
-    public function afterStep($event)
+    public function afterStep(AfterStepTested $event)
     {
-        $code = $event->getTestResult()->getResultCode();
-        if (TestResult::FAILED === $code) {
-            if ($event->getTestResult()->hasException()) {
-                $failureNode = $this->currentTestcase->addChild('failure');
+        $message = $event->getStep()->getKeyword().' '.$event->getStep()->getText();
 
-                $failureText = $event->getStep()->getKeyword().' '.$event->getStep()->getText().":\n\n".$event->getTestResult()
-                        ->getException()->getMessage();
+        $testResult = $event->getTestResult();
+        if ($testResult instanceof ExceptionResult && $testResult->hasException()) {
+            $message .= ': '.$this->exceptionPresenter->presentException($testResult->getException());
+        }
 
-                // add cdata
-                $node = dom_import_simplexml($failureNode);
-                $no   = $node->ownerDocument;
-                $node->appendChild($no->createCDATASection($failureText));
+        switch ($testResult->getResultCode()) {
+            case TestResult::FAILED:
+                $data = $this->currentDocument->createCDATASection($message);
+                $this->currentTestCase->addFailure(null, 'failure')->appendChild($data);
+                break;
 
-                $failureNode->addAttribute('type', \get_class($event->getTestResult()->getException()));
-            }
+            case TestResult::PENDING:
+                $data = $this->currentDocument->createCDATASection($message);
+                $this->currentTestCase->addError(null, 'pending')->appendChild($data);
+
+                break;
+
+            case StepResult::UNDEFINED:
+                $data = $this->currentDocument->createCDATASection($message);
+                $this->currentTestCase->addError(null, 'undefined')->appendChild($data);
+                break;
         }
     }
 
-    /**
-     * afterScenario.
-     *
-     * @param mixed $event
-     */
-    public function afterScenario($event)
+    public function afterScenario(AfterScenarioTested $event)
     {
-        $this->testcaseTimer->stop();
-        $code             = $event->getTestResult()->getResultCode();
-        $testResultString = [
-            TestResult::PASSED    => 'passed',
-            TestResult::SKIPPED   => 'skipped',
-            TestResult::PENDING   => 'pending',
-            TestResult::FAILED    => 'failed',
-            TestResult::UNDEFINED => 'undefined',
-        ];
+        $this->testCaseTimer->stop();
 
-        ++$this->testsuiteStats[$code];
+        $this->currentTestCase->setTime($this->formatTime($this->testCaseTimer));
+        $this->currentTestCase->setAttribute('status', $this->converter->convertResultToString($event->getTestResult()));
 
-        $this->currentTestcase->addAttribute('time', \round($this->testcaseTimer->getTime(), 3));
-        $this->currentTestcase->addAttribute('status', $testResultString[$code]);
+        // Don't think these cause any real problems, but fail to pass the junit.xsd validation.
+        $this->currentTestCase->removeAttribute('errors');
+        $this->currentTestCase->removeAttribute('failures');
+
+        $this->printer->setFileName($this->fileName($event));
+        $this->printer->write($this->currentDocument->saveXML());
+    }
+
+    private function initBeforeScenario(ScenarioTested $event, $name)
+    {
+        $name = implode(' ', array_map(function ($l) {
+            return trim($l);
+        }, explode("\n", $name)));
+
+        $this->currentDocument  = new Document();
+        $this->currentTestSuite = $this->currentDocument->addTestSuite();
+        $this->currentTestSuite->setName($event->getFeature()->getTitle());
+        $this->currentTestCase = $this->currentTestSuite->addTestCase();
+        $this->currentTestCase->setName($name);
+        $this->testCaseTimer->start();
+    }
+    
+    /**
+     * @param AfterScenarioTested $event
+     *
+     * @return string
+     */
+    private function fileName(AfterScenarioTested $event)
+    {
+        $name = str_replace($this->baseDir, '', $event->getFeature()->getFile());
+        $name = $name.'_'.$event->getScenario()->getLine();
+
+        return strtolower(trim(preg_replace('/[^[:alnum:]_]+/', '_', $name), '_'));
     }
 
     /**
-     * afterFeature.
+     * Really this just provides a trick for testing (round up to 1 second).
      *
-     * @param FeatureTested $event
-     */
-    public function afterFeature(FeatureTested $event)
-    {
-        $this->testsuiteTimer->stop();
-        $testsuite          = $this->currentTestsuite;
-        $testsuite['tests'] = array_sum($this->testsuiteStats);
-        $testsuite->addAttribute('failures', $this->testsuiteStats[TestResult::FAILED]);
-        $testsuite->addAttribute('skipped', $this->testsuiteStats[TestResult::SKIPPED]);
-        $testsuite->addAttribute('errors', $this->testsuiteStats[TestResult::PENDING]);
-        $testsuite->addAttribute('time', \round($this->testsuiteTimer->getTime(), 3));
-    }
-
-    /**
-     * afterSuite.
+     * @param Timer $timer
      *
-     * @param SuiteTested $event
+     * @return float|int
      */
-    public function afterSuite(SuiteTested $event)
+    private function formatTime(Timer $timer)
     {
-    }
+        $time = \round($timer->getTime(), 3);
 
-    /**
-     * @param ExerciseCompleted $event
-     */
-    public function afterExercise(ExerciseCompleted $event)
-    {
-        $dom                     = new \DOMDocument('1.0');
-        $dom->preserveWhitespace = false;
-        $dom->formatOutput       = true;
-        $dom->loadXml($this->xml->asXml());
+        if ($time < 1) {
+            return 1;
+        }
 
-        $this->printer->write($dom->saveXML());
+        return $time;
     }
 }

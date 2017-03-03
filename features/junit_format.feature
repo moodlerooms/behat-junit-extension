@@ -49,7 +49,7 @@ Feature: JUnit Formatter
     default:
       extensions:
         Moodlerooms\BehatJUnitExtension\Extension:
-            outputDir: %paths.base%/junit
+          outputDir: %paths.base%/junit
     """
     And a file named "features/World.feature" with:
       """
@@ -107,30 +107,93 @@ Feature: JUnit Formatter
               throw new PendingException();
           }
       """
-    And "junit/todo.xml" file xml should be like:
+    And the file "junit/features_World_feature_9.xml" should be a valid document according to "junit.xsd"
+    And the file "junit/features_World_feature_14.xml" should be a valid document according to "junit.xsd"
+    And the file "junit/features_World_feature_19.xml" should be a valid document according to "junit.xsd"
+    And the file "junit/features_World_feature_29.xml" should be a valid document according to "junit.xsd"
+    And the file "junit/features_World_feature_30.xml" should be a valid document according to "junit.xsd"
+    And the file "junit/features_World_feature_31.xml" should be a valid document according to "junit.xsd"
+    And the file "junit/features_World_feature_39.xml" should be a valid document according to "junit.xsd"
+    And the file "junit/features_World_feature_40.xml" should be a valid document according to "junit.xsd"
+    And "junit/features_World_feature_9.xml" file xml should be like:
       """
       <?xml version="1.0" encoding="UTF-8"?>
-      <testsuites name="default">
-        <testsuite name="World consistency" tests="8" skipped="0" failures="3" errors="2">
-          <testcase name="Undefined" status="undefined">
-            <error message="And Something new" type="undefined"/>
+      <testsuites>
+        <testsuite name="World consistency" tests="1" errors="1">
+          <testcase name="Undefined" time="1" status="undefined">
+            <error type="undefined"><![CDATA[And Something new]]></error>
           </testcase>
-          <testcase name="Pending" status="pending">
-            <error message="And Something not done yet: TODO: write pending definition" type="pending"/>
-          </testcase>
-          <testcase name="Failed" status="failed">
-            <failure message="Then I must have 13: Failed asserting that 14 matches expected '13'."/>
-          </testcase>
-          <testcase name="Passed &amp; Failed #1" status="failed">
-            <failure message="Then I must have 16: Failed asserting that 15 matches expected '16'."/>
-          </testcase>
-          <testcase name="Passed &amp; Failed #2" status="passed"/>
-          <testcase name="Passed &amp; Failed #3" status="failed">
-            <failure message="Then I must have 32: Failed asserting that 33 matches expected '32'."/>
-          </testcase>
-          <testcase name="Another Outline #1" status="passed"/>
-          <testcase name="Another Outline #2" status="passed"/>
         </testsuite>
       </testsuites>
       """
-    And the file "junit/todo.xml" should be a valid document according to "junit.xsd"
+    And "junit/features_World_feature_14.xml" file xml should be like:
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <testsuites>
+        <testsuite name="World consistency" tests="1" errors="1">
+          <testcase name="Pending" time="1" status="pending">
+            <error type="pending"><![CDATA[And Something not done yet: TODO: write pending definition]]></error>
+          </testcase>
+        </testsuite>
+      </testsuites>
+      """
+    And "junit/features_World_feature_19.xml" file xml should be like:
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <testsuites>
+        <testsuite name="World consistency" tests="1" failures="1">
+          <testcase name="Failed" time="1" status="failed">
+            <failure type="failure"><![CDATA[Then I must have 13: Failed asserting that 14 matches expected '13'.]]></failure>
+          </testcase>
+        </testsuite>
+      </testsuites>
+      """
+    And "junit/features_World_feature_29.xml" file xml should be like:
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <testsuites>
+        <testsuite name="World consistency" tests="1" failures="1">
+          <testcase name="Passed &amp; Failed Line #29" time="1" status="failed">
+            <failure type="failure"><![CDATA[Then I must have 16: Failed asserting that 15 matches expected '16'.]]></failure>
+          </testcase>
+        </testsuite>
+      </testsuites>
+      """
+    And "junit/features_World_feature_30.xml" file xml should be like:
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <testsuites>
+        <testsuite name="World consistency" tests="1">
+          <testcase name="Passed &amp; Failed Line #30" time="1" status="passed"/>
+        </testsuite>
+      </testsuites>
+      """
+    And "junit/features_World_feature_31.xml" file xml should be like:
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <testsuites>
+        <testsuite name="World consistency" tests="1" failures="1">
+          <testcase name="Passed &amp; Failed Line #31" time="1" status="failed">
+            <failure type="failure"><![CDATA[Then I must have 32: Failed asserting that 33 matches expected '32'.]]></failure>
+          </testcase>
+        </testsuite>
+      </testsuites>
+      """
+    And "junit/features_World_feature_39.xml" file xml should be like:
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <testsuites>
+        <testsuite name="World consistency" tests="1">
+          <testcase name="Another Outline Line #39" time="1" status="passed"/>
+        </testsuite>
+      </testsuites>
+      """
+    And "junit/features_World_feature_40.xml" file xml should be like:
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <testsuites>
+        <testsuite name="World consistency" tests="1">
+          <testcase name="Another Outline Line #40" time="1" status="passed"/>
+        </testsuite>
+      </testsuites>
+      """
