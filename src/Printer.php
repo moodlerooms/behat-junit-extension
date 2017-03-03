@@ -48,10 +48,10 @@ class Printer implements OutputPrinter
         $realPath = realpath($path);
 
         if ($realPath === false) {
-            throw new BadOutputPathException(sprintf('The argument to `output` is expected to the a directory, but got %s!', $path), $path);
+            throw new BadOutputPathException('Directory expected for the `outputDir` option, but a non-existent or invalid path was given.', $path);
         }
         if (!is_dir($realPath)) {
-            throw new BadOutputPathException(sprintf('The argument to `output` is expected to the a directory, but got %s!', $path), $path);
+            throw new BadOutputPathException('Directory expected for the `outputDir` option, but a filename was given.', $path);
         }
         $this->path = $realPath;
     }

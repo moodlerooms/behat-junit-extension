@@ -11,12 +11,12 @@ use Behat\Behat\EventDispatcher\Event\OutlineTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Behat\EventDispatcher\Event\StepTested;
 use Behat\Behat\Output\Node\Printer\Helper\ResultToStringConverter;
-use Behat\Behat\Tester\Result\StepResult as TestResult;
 use Behat\Behat\Tester\Result\StepResult;
 use Behat\Testwork\Counter\Timer;
 use Behat\Testwork\Exception\ExceptionPresenter;
 use Behat\Testwork\Output\Formatter as FormatterInterface;
 use Behat\Testwork\Tester\Result\ExceptionResult;
+use Behat\Testwork\Tester\Result\TestResult;
 use N98\JUnitXml\Document;
 use N98\JUnitXml\TestCaseElement;
 use N98\JUnitXml\TestSuiteElement;
@@ -198,7 +198,6 @@ class Formatter implements FormatterInterface
             case TestResult::PENDING:
                 $data = $this->currentDocument->createCDATASection($message);
                 $this->currentTestCase->addError(null, 'pending')->appendChild($data);
-
                 break;
 
             case StepResult::UNDEFINED:
@@ -236,7 +235,7 @@ class Formatter implements FormatterInterface
         $this->currentTestCase->setName($name);
         $this->testCaseTimer->start();
     }
-    
+
     /**
      * @param AfterScenarioTested $event
      *
