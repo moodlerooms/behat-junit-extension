@@ -266,7 +266,7 @@ class Formatter implements FormatterInterface
     {
         $this->testCaseTimer->stop();
 
-        $this->currentTestCase->setTime($this->formatTime($this->testCaseTimer));
+        $this->currentTestCase->setTime(\round($this->testCaseTimer->getTime(), 3));
         $this->currentTestCase->setAttribute('status', $this->converter->convertResultToString($event->getTestResult()));
 
         if (!empty($this->hookErrors)) {
@@ -323,24 +323,6 @@ class Formatter implements FormatterInterface
         $name = $name.'_'.$event->getScenario()->getLine();
 
         return strtolower(trim(preg_replace('/[^[:alnum:]_]+/', '_', $name), '_'));
-    }
-
-    /**
-     * Really this just provides a trick for testing (round up to 1 second).
-     *
-     * @param Timer $timer
-     *
-     * @return float|int
-     */
-    private function formatTime(Timer $timer)
-    {
-        $time = \round($timer->getTime(), 3);
-
-        if ($time < 1) {
-            return 1;
-        }
-
-        return $time;
     }
 
     /**

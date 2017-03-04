@@ -161,6 +161,9 @@ class FeatureContext implements Context
 
         $fileContent = trim(file_get_contents($path));
 
+        // Change all time values to 1 second.
+        $fileContent = preg_replace('/time="[\d\.]+"/', 'time="1"', $fileContent);
+
         $dom = new DOMDocument();
         $dom->loadXML($text);
         $dom->formatOutput = true;
