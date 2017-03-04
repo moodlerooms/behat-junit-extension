@@ -106,7 +106,12 @@ class Printer implements OutputPrinter
      */
     public function write($messages)
     {
-        $file = $this->getOutputPath().DIRECTORY_SEPARATOR.$this->fileName;
+        $outputPath = $this->getOutputPath();
+        if (empty($outputPath)) {
+            throw new \RuntimeException('Output path for moodle_junit format is missing, please specify one with the -o option');
+        }
+
+        $file = $outputPath.DIRECTORY_SEPARATOR.$this->fileName;
         file_put_contents($file, $messages);
     }
 
