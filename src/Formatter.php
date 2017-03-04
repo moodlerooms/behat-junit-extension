@@ -90,14 +90,13 @@ class Formatter implements FormatterInterface
     private $hookErrors = [];
 
     /**
-     * @param string                  $outputDir
      * @param string                  $baseDir
      * @param ExceptionPresenter      $exceptionPresenter
      * @param ResultToStringConverter $converter
      */
-    public function __construct($outputDir, $baseDir, ExceptionPresenter $exceptionPresenter, ResultToStringConverter $converter)
+    public function __construct($baseDir, ExceptionPresenter $exceptionPresenter, ResultToStringConverter $converter)
     {
-        $this->printer            = new Printer($outputDir);
+        $this->printer            = new Printer();
         $this->testCaseTimer      = new Timer();
         $this->baseDir            = $baseDir;
         $this->exceptionPresenter = $exceptionPresenter;

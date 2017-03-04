@@ -18,14 +18,6 @@ class Printer implements OutputPrinter
     private $fileName;
 
     /**
-     * @param string $path Path to write JUnit XML files
-     */
-    public function __construct($path)
-    {
-        $this->setOutputPath($path);
-    }
-
-    /**
      * Sets file name.
      *
      * @param string $fileName

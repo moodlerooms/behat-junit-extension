@@ -8,8 +8,7 @@ Feature: JUnit Formatter
     """
     default:
       extensions:
-        Moodlerooms\BehatJUnitExtension\Extension:
-          outputDir: %paths.base%/junit
+        Moodlerooms\BehatJUnitExtension\Extension: ~
     """
 
   Scenario: Normal Scenario's
@@ -96,7 +95,7 @@ Feature: JUnit Formatter
           | 5     | 15     |
           | 10    | 20     |
       """
-    When I run "behat --no-colors -f moodle_junit --snippets-for=FeatureContext --snippets-type=regex"
+    When I run "behat --no-colors -f moodle_junit -o junit --snippets-for=FeatureContext --snippets-type=regex"
     Then it should fail with:
       """
       --- FeatureContext has missing steps. Define them with these snippets:
@@ -258,7 +257,7 @@ Feature: JUnit Formatter
           When I add 8
           Then I must have 18
       """
-    When I run "behat --no-colors -f moodle_junit"
+    When I run "behat --no-colors -f moodle_junit -o junit"
     And the file "junit/features_adding_feature_1_feature_6.xml" should be a valid document according to "junit.xsd"
     And the file "junit/features_adding_feature_2_feature_6.xml" should be a valid document according to "junit.xsd"
     And "junit/features_adding_feature_1_feature_6.xml" file xml should be like:
@@ -339,7 +338,7 @@ Feature: JUnit Formatter
           And I subtract the value 6
           Then I must have 4
       """
-    When I run "behat --no-colors -f moodle_junit"
+    When I run "behat --no-colors -f moodle_junit -o junit"
     Then it should pass with no output
     And the file "junit/features_world_feature_9.xml" should be a valid document according to "junit.xsd"
     And the file "junit/features_world_feature_15.xml" should be a valid document according to "junit.xsd"
@@ -471,7 +470,7 @@ Feature: JUnit Formatter
           Moodlerooms\BehatJUnitExtension\Extension:
             outputDir: %paths.base%/junit
       """
-    When I run "behat --no-colors -f moodle_junit"
+    When I run "behat --no-colors -f moodle_junit -o junit"
     Then it should fail with no output
     And the file "junit/features_apple_eating_smallkid_feature_9.xml" should be a valid document according to "junit.xsd"
     And the file "junit/features_apple_eating_oldmen_feature_9.xml" should be a valid document according to "junit.xsd"
@@ -537,7 +536,7 @@ Feature: JUnit Formatter
         Scenario: Skipped
           Then I must have 10
       """
-    When I run "behat --no-colors -f moodle_junit"
+    When I run "behat --no-colors -f moodle_junit -o junit"
     And "junit/features_world_feature_9.xml" file xml should be like:
       """
       <?xml version="1.0" encoding="UTF-8"?>
@@ -597,7 +596,7 @@ Feature: JUnit Formatter
           When I add 4
           Then I must have 13
       """
-    When I run "behat --no-colors -f moodle_junit"
+    When I run "behat --no-colors -f moodle_junit -o junit"
     Then it should fail with no output
     And "junit/features_world_feature_9.xml" file xml should be like:
       """
@@ -683,7 +682,7 @@ Feature: JUnit Formatter
           Then I must have 10
 
       """
-    When I run "behat --no-colors -f moodle_junit"
+    When I run "behat --no-colors -f moodle_junit -o junit"
     And "junit/features_world_feature_9.xml" file xml should be like:
       """
       <?xml version="1.0" encoding="UTF-8"?>
@@ -739,7 +738,7 @@ Feature: JUnit Formatter
           Then I must have 10
 
       """
-    When I run "behat --no-colors -f moodle_junit"
+    When I run "behat --no-colors -f moodle_junit -o junit"
     And "junit/features_world_feature_9.xml" file xml should be like:
       """
       <?xml version="1.0" encoding="UTF-8"?>

@@ -19,17 +19,17 @@ default:
 
     extensions:
         Moodlerooms\BehatJUnitExtension\Extension:
-            outputDir: %paths.base%/build/tests
+            baseDir: /path/to/moodle
     ...
 ```
 
 Be sure to call Behat with the formatter:
 
-    behat -f moodle_junit
+    behat -f moodle_junit -o reports_dir
 
 # Configuration
 
-* `outputDir` - Directory to store all of the JUnit XML files.
+* `baseDir` - (Optional) Just shortens JUnit XML file names.
 
 # Credits
 

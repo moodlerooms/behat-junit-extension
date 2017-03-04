@@ -41,7 +41,7 @@ class Extension implements ExtensionInterface
      */
     public function configure(ArrayNodeDefinition $builder)
     {
-        $builder->children()->scalarNode('outputDir')->defaultValue('build/tests');
+        $builder->children()->scalarNode('baseDir')->defaultValue('%paths.base%');
     }
 
     /**
@@ -52,11 +52,11 @@ class Extension implements ExtensionInterface
         $definition = new Definition('Behat\Behat\Output\Node\Printer\Helper\ResultToStringConverter');
         $container->setDefinition(self::RESULT_TO_STRING_CONVERTER_ID, $definition);
 
-        $definition = new Definition('Moodlerooms\\BehatJUnitExtension\\Formatter');
-        $definition->addArgument($config['outputDir']);
-        $definition->addArgument('%paths.base%');
-        $definition->addArgument(new Reference(ExceptionExtension::PRESENTER_ID));
-        $definition->addArgument(new Reference(self::RESULT_TO_STRING_CONVERTER_ID));
+        $definition = new Definition('Moodlerooms\\BehatJUnitExtension\\Formatter', [
+            $config['baseDir'],
+            new Reference(ExceptionExtension::PRESENTER_ID),
+            new Reference(self::RESULT_TO_STRING_CONVERTER_ID),
+        ]);
 
         $container->setDefinition('moodlerooms.junit.formatter', $definition)
             ->addTag('output.formatter');
