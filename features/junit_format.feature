@@ -467,8 +467,7 @@ Feature: JUnit Formatter
             filters:
               role: old man
         extensions:
-          Moodlerooms\BehatJUnitExtension\Extension:
-            outputDir: %paths.base%/junit
+          Moodlerooms\BehatJUnitExtension\Extension: ~
       """
     When I run "behat --no-colors -f moodle_junit -o junit"
     Then it should fail with no output
@@ -626,13 +625,6 @@ Feature: JUnit Formatter
     And a file named "junit.txt" with:
       """
       """
-    And a file named "behat.yml" with:
-    """
-    default:
-      extensions:
-        Moodlerooms\BehatJUnitExtension\Extension:
-          outputDir: %paths.base%/junit.txt
-    """
     When I run "behat --no-colors -f junit -o junit.txt"
     Then it should fail with:
       """
