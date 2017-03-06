@@ -23,6 +23,20 @@ default:
     ...
 ```
 
+This is how you would do the above via Moodle's config file:
+
+```php
+$CFG->behat_config = [
+    'default' => [
+        'extensions' => [
+            'Moodlerooms\BehatJUnitExtension\Extension' => [
+                'baseDir' => __DIR__,
+            ]
+        ]
+    ],
+];
+```
+
 Be sure to call Behat with the formatter:
 
     behat -f moodle_junit -o reports_dir
@@ -33,4 +47,7 @@ Be sure to call Behat with the formatter:
 
 # Credits
 
-Heavily inspired by [behat-junit-formatter](https://github.com/j-arnaiz/behat-junit-formatter).
+Heavily inspired by:
+
+* [Behat's](https://github.com/Behat/Behat) own JUnit formatter.
+* [behat-junit-formatter](https://github.com/j-arnaiz/behat-junit-formatter)
