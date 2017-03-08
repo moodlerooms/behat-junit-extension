@@ -1,7 +1,8 @@
 <?php
 
 $finder = Symfony\CS\Finder::create()
-    ->in(__DIR__.'/src');
+    ->in(__DIR__.'/src')
+    ->in(__DIR__.'/features');
 
 return Symfony\CS\Config::create()
     ->setUsingCache(true)

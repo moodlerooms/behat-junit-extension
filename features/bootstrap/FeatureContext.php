@@ -88,7 +88,7 @@ class FeatureContext implements Context
     }
 
     /**
-     * Runs behat command with provided parameters
+     * Runs behat command with provided parameters.
      *
      * @When /^I run "behat(?: ((?:\"|[^"])*))?"$/
      *
@@ -191,18 +191,18 @@ class FeatureContext implements Context
         if ('/' !== DIRECTORY_SEPARATOR) {
             $text = preg_replace_callback(
                 '/[ "]features\/[^\n "]+/', function ($matches) {
-                return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
-            }, $text
+                    return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
+                }, $text
             );
             $text = preg_replace_callback(
                 '/\<span class\="path"\>features\/[^\<]+/', function ($matches) {
-                return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
-            }, $text
+                    return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
+                }, $text
             );
             $text = preg_replace_callback(
                 '/\+[fd] [^ ]+/', function ($matches) {
-                return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
-            }, $text
+                    return str_replace('/', DIRECTORY_SEPARATOR, $matches[0]);
+                }, $text
             );
         }
 
@@ -266,7 +266,7 @@ class FeatureContext implements Context
         // Replace wrong warning message of HHVM
         $output = str_replace('Notice: Undefined index: ', 'Notice: Undefined offset: ', $output);
 
-        return trim(preg_replace("/ +$/m", '', $output));
+        return trim(preg_replace('/ +$/m', '', $output));
     }
 
     private function createFile($filename, $content)
