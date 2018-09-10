@@ -6,7 +6,7 @@ Behat extension that reports with the JUnit format and is compatible with Moodle
 
 Install with Composer:
 
-    composer require --dev moodlerooms/behat-junit-extension
+    composer require --dev blackboard-open-source/behat-junit-extension
 
 # Usage
 
@@ -18,7 +18,7 @@ default:
     ...
 
     extensions:
-        Moodlerooms\BehatJUnitExtension\Extension:
+        BehatJUnitExtension\Extension:
             baseDir: /path/to/moodle
     ...
 ```
@@ -29,7 +29,7 @@ This is how you would do the above via Moodle's config file:
 $CFG->behat_config = [
     'default' => [
         'extensions' => [
-            'Moodlerooms\BehatJUnitExtension\Extension' => [
+            'BehatJUnitExtension\Extension' => [
                 'baseDir' => __DIR__,
             ]
         ]

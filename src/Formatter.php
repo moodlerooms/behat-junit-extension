@@ -1,6 +1,6 @@
 <?php
 
-namespace Moodlerooms\BehatJUnitExtension;
+namespace BehatJUnitExtension;
 
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\AfterStepTested;

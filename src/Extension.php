@@ -1,6 +1,6 @@
 <?php
 
-namespace Moodlerooms\BehatJUnitExtension;
+namespace BehatJUnitExtension;
 
 use Behat\Testwork\Exception\ServiceContainer\ExceptionExtension;
 use Behat\Testwork\ServiceContainer\Extension as ExtensionInterface;
@@ -26,7 +26,7 @@ class Extension implements ExtensionInterface
      */
     public function getConfigKey()
     {
-        return 'moodleroomsJUnit';
+        return 'extensionJUnit';
     }
 
     /**
@@ -52,13 +52,13 @@ class Extension implements ExtensionInterface
         $definition = new Definition('Behat\Behat\Output\Node\Printer\Helper\ResultToStringConverter');
         $container->setDefinition(self::RESULT_TO_STRING_CONVERTER_ID, $definition);
 
-        $definition = new Definition('Moodlerooms\\BehatJUnitExtension\\Formatter', [
+        $definition = new Definition('BehatJUnitExtension\\Formatter', [
             $config['baseDir'],
             new Reference(ExceptionExtension::PRESENTER_ID),
             new Reference(self::RESULT_TO_STRING_CONVERTER_ID),
         ]);
 
-        $container->setDefinition('moodlerooms.junit.formatter', $definition)
+        $container->setDefinition('behatjunitextension.junit.formatter', $definition)
             ->addTag('output.formatter');
     }
 }

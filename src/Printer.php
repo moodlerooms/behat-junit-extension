@@ -1,6 +1,6 @@
 <?php
 
-namespace Moodlerooms\BehatJUnitExtension;
+namespace BehatJUnitExtension;
 
 use Behat\Testwork\Output\Exception\BadOutputPathException;
 use Behat\Testwork\Output\Printer\OutputPrinter;

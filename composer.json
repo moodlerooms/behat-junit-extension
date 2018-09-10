@@ -1,5 +1,5 @@
 {
-  "name": "moodlerooms/behat-junit-extension",
+  "name": "blackboard-open-source/behat-junit-extension",
   "description": "Behat extension that reports with the JUnit format and is compatible with Moodle reruns.",
   "keywords": ["moodle", "behat", "junit"],
   "type": "project",
@@ -7,8 +7,8 @@
   "authors": [
     {
       "name": "Mark Nielsen",
-      "email": "mark@moodlerooms.com",
-      "homepage": "http://moodlerooms.com",
+      "email": "mark.nielsen@blackboard.com",
+      "homepage": "https://www.blackboard.com",
       "role": "Developer"
     }
   ],
@@ -24,7 +24,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Moodlerooms\\BehatJUnitExtension\\": "src/"
+      "BehatJUnitExtension\\": "src/"
     }
   },
   "scripts": {

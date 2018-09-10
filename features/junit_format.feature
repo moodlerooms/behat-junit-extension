@@ -8,7 +8,7 @@ Feature: JUnit Formatter
     """
     default:
       extensions:
-        Moodlerooms\BehatJUnitExtension\Extension: ~
+        BehatJUnitExtension\Extension: ~
     """
 
   Scenario: Normal Scenario's
@@ -467,7 +467,7 @@ Feature: JUnit Formatter
             filters:
               role: old man
         extensions:
-          Moodlerooms\BehatJUnitExtension\Extension: ~
+          BehatJUnitExtension\Extension: ~
       """
     When I run "behat --no-colors -f moodle_junit -o junit"
     Then it should fail with no output
@@ -628,8 +628,7 @@ Feature: JUnit Formatter
     When I run "behat --no-colors -f junit -o junit.txt"
     Then it should fail with:
       """
-      [Behat\Testwork\Output\Exception\BadOutputPathException]
-        Directory expected for the `outputDir` option, but a filename was given.
+        Directory expected for the `outputDir` option, but a filename was given
       """
 
   Scenario: Include BeforeStep Failures
