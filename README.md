@@ -6,7 +6,7 @@ Behat extension that reports with the JUnit format and is compatible with Moodle
 
 Install with Composer:
 
-    composer require --dev blackboard-open-source/behat-junit-extension
+    composer require --dev open-lms-open-source/behat-junit-extension
 
 # Usage
 

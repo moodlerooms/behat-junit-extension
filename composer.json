@@ -1,5 +1,5 @@
 {
-  "name": "blackboard-open-source/behat-junit-extension",
+  "name": "open-lms-open-source/behat-junit-extension",
   "description": "Behat extension that reports with the JUnit format and is compatible with Moodle reruns.",
   "keywords": ["moodle", "behat", "junit"],
   "type": "project",
@@ -9,6 +9,12 @@
       "name": "Mark Nielsen",
       "email": "mark.nielsen@blackboard.com",
       "homepage": "https://www.blackboard.com",
+      "role": "Developer"
+    },
+    {
+      "name": "David Castro",
+      "email": "david.castro@openlms.net",
+      "homepage": "https://www.openlms.net",
       "role": "Developer"
     }
   ],
